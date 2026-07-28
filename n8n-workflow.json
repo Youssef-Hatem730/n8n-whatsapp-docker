@@ -1,0 +1,3908 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "phone",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -8240,
+        4000
+      ],
+      "id": "f4af97e2-d9d6-4f2a-b6d1-690282ad84a5",
+      "name": "Webhook",
+      "webhookId": "807617a7-3316-436f-aafd-6eac63ce1d46"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "phone",
+        "remoteJid": "={{ $node[\"Webhook\"].json.body.data.key.remoteJid }}",
+        "messageText": "={{ $json.text }}",
+        "options_message": {
+          "quoted": {
+            "messageQuoted": {
+              "messageId": "={{ $('Webhook').item.json.body.data.key.id }}"
+            }
+          },
+          "linkPreview": true
+        }
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5760,
+        6144
+      ],
+      "id": "f39e8dd6-0bbc-4ffe-8e41-a3b0ce7df72c",
+      "name": "Send text",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -6048,
+        6240
+      ],
+      "id": "10522c01-a89e-4108-8b04-4b5cc90b436a",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "kEBNmlbFs4Gu0JTA",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.imageUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -5952,
+        2832
+      ],
+      "id": "f5845e07-7851-4405-bddf-b5779f536438",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "Result",
+        "include": "specifiedFields",
+        "fieldsToInclude": "title,imageUrl",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -6528,
+        2832
+      ],
+      "id": "1d51c5fc-20cd-40ad-8c2a-60d7302775bb",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.Result[Math.floor(Math.random() * $json.Result.length) ]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6256,
+        2832
+      ],
+      "id": "873c763b-d4d8-497a-8d7d-6f773fe8c0f2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.imageUrl }}",
+        "caption": "={{ $json.title +\"\\n\"+$json.imageUrl}}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5664,
+        2832
+      ],
+      "id": "c00c22a9-9fdf-477f-ab4c-cb6f6c7d957a",
+      "name": "Send image",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-sticker",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "stickerUrl": "={{ $json.data.base64 }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-nk.evolutionApiNk",
+      "typeVersion": 1,
+      "position": [
+        -6128,
+        1712
+      ],
+      "id": "7f44109c-f90a-4b57-a30e-26edb7d4574a",
+      "name": "Enviar sticker",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-audio",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6256,
+        2656
+      ],
+      "id": "9f95d8ac-9006-49e6-9aa7-de662f659d79",
+      "name": "Send audio",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6528,
+        2656
+      ],
+      "id": "ed119b00-2b3b-4548-984a-7e2722790fc6",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.1-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.1-flash-lite"
+        },
+        "text": "answer in short .Give information about the thing that is shown in the photo. If a human or creature give information about it ,if it is a thing ,give details and its function;either ways,say where is it from",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -6112,
+        4960
+      ],
+      "id": "e146ad04-718d-40be-99b5-499914056cdc",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "kEBNmlbFs4Gu0JTA",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6416,
+        4960
+      ],
+      "id": "e96f2fe1-5838-4653-a700-19a36d58c2ba",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "phone",
+        "remoteJid": "={{ $node[\"Webhook\"].json.body.data.key.remoteJid }}",
+        "messageText": "={{ $json.content.parts[0].text }}",
+        "options_message": {
+          "quoted": {
+            "messageQuoted": {
+              "messageId": "={{ $('Webhook').item.json.body.data.key.id }}"
+            }
+          },
+          "linkPreview": true
+        }
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5904,
+        4960
+      ],
+      "id": "af2ec877-b49c-4184-aa43-0bf3e223682b",
+      "name": "Send text1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "profile-api",
+        "operation": "update-profile-picture",
+        "instanceName": "phone",
+        "picture": "={{ $json.data.base64 }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6144,
+        1312
+      ],
+      "id": "2b94f972-af03-4cef-b062-60b86bfd5fe4",
+      "name": "Update profile picture",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6416,
+        5152
+      ],
+      "id": "e296f297-37b8-4b35-b646-72392037c0f0",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6112,
+        5152
+      ],
+      "id": "d205bdc1-0043-4b0c-a8a1-1ae3e7b71199",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "phone",
+        "remoteJid": "={{ $node[\"Webhook\"].json.body.data.key.remoteJid }}",
+        "messageText": "={{ $json.text }}",
+        "options_message": {
+          "quoted": {
+            "messageQuoted": {
+              "messageId": "={{ $('Webhook').item.json.body.data.key.id }}"
+            }
+          },
+          "linkPreview": true
+        }
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5664,
+        5152
+      ],
+      "id": "a85a6aa7-dc6b-40f1-8ca8-87b9db345edd",
+      "name": "Send text2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f8b3c34-8f71-438d-8d20-ec6350602399",
+              "name": "text",
+              "value": "={{\n  $json.text\n      .replaceAll($json.text.slice(0,$json.text.indexOf(\"Signature\") + 9), \"\")\n    .replaceAll(\" \", \"-\")\n    .replaceAll(\"\\n\", \" \")\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5904,
+        5152
+      ],
+      "id": "3e46e7e9-031a-4baf-938d-d9b87a7532fd",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.urls }}",
+        "caption": "={{ $json.Title }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5216,
+        5440
+      ],
+      "id": "a4638369-c329-4eb1-b8ce-61da192abca9",
+      "name": "Send image1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6537b14c-23f3-4872-85e8-3d6d94deb748",
+              "name": "posts",
+              "value": "={{ $json.posts.filter(item => item.urls.includes('png')|| item.urls.includes('jpeg')|| item.urls.includes('jpg')).toJsonString()}}\n",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6112,
+        5344
+      ],
+      "id": "120b122d-f25c-45f6-8f1f-8ba733e8eb6a",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.posts.randomItem() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5440,
+        5440
+      ],
+      "id": "224e1923-425e-4be2-95a6-4acce7d03299",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.body.data.contextInfo.quotedMessage.conversation+\"\\n\" }}\n{{ $json.body.data.message.conversation.split(\" \").filter(word => !word.includes('.')).join(\" \")}}\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Reply at max 10 lines and add \"your dear @nova\" at the end .  Act like an anime girl keep the conversation funny and cute "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -6256,
+        6048
+      ],
+      "id": "f5511468-abef-4aac-aa03-8b5ebeac76f8",
+      "name": "cutie nova"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.body.data.contextInfo.quotedMessage.conversation+\"\\n\" }}\n{{ $json.body.data.message.conversation.split(\" \").filter(word => !word.includes('.')).join(\" \")}}\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=act in aggressive Insane Roasting jerk way in Egyptian language at the end add \"your nightmare @vex\"  (in 8 lines max)"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -6256,
+        6240
+      ],
+      "id": "8a65e6c4-3b40-4dc7-893f-6f2f70605a49",
+      "name": "nightmare vex"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "38df7824-477b-45a0-af80-c1077bf7e9bc",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation.split(\" \")[3]||\"\" }}",
+              "rightValue": "all",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5904,
+        5344
+      ],
+      "id": "2472c7c7-9c4e-420e-b065-ac14e2d0b698",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "posts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -5440,
+        5248
+      ],
+      "id": "9f60e024-3b75-4bb0-8965-4f86a1a30fa9",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.urls }}",
+        "caption": "=",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5216,
+        5248
+      ],
+      "id": "2683b3ee-b5b7-4f25-a8a9-abd472385ae5",
+      "name": "Send image2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{  $json.images_results.randomItem().original}}",
+        "caption": "=",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6112,
+        4480
+      ],
+      "id": "20e9e158-b5f7-40e2-a6f1-feed4494f425",
+      "name": "Send image3",
+      "retryOnFail": true,
+      "waitBetweenTries": 5,
+      "maxTries": 5,
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images_results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -5904,
+        4608
+      ],
+      "id": "9643b987-7b6c-48e5-b2a9-2e19528f5fbc",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "phone",
+        "messageId": "={{ $('Webhook').item.json.body.data.contextInfo.stanzaId }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6384,
+        1312
+      ],
+      "id": "2418507b-3c82-4534-849c-0a5a3fb4aed7",
+      "name": "(.pfp)Get media in base65",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "delete-message",
+        "instanceName": "phone",
+        "remoteJid": "={{ $json.body.data.key.remoteJid }}",
+        "messageId": "={{ $('Webhook').item.json.body.data.contextInfo.stanzaId }}",
+        "fromMe": true
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6368,
+        1552
+      ],
+      "id": "47734bcf-9060-49cd-abd3-271bc1efa590",
+      "name": ".del",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://reddit-fetcher:8000/top-posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Subreddit-Name",
+              "value": "={{ $json.body.data.message.conversation\n  .split(\" \")[1]||\"random\"}}"
+            },
+            {
+              "name": "X-Num-Of-Posts",
+              "value": "= {{ $json.body.data.message.conversation   .split(\" \")[2]||20}}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -6768,
+        5360
+      ],
+      "id": "f956a454-c55e-47df-9737-570477588f51",
+      "name": ".r"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "phone",
+        "messageId": "={{ $json.body.data.contextInfo.stanzaId }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6768,
+        5152
+      ],
+      "id": "ee1a67db-1401-4b46-96f6-610e821b6732",
+      "name": ".find(base64)",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Webhook').item.json.body.data.message.conversation.substring(5) }}",
+        "voiceId": "rachel",
+        "output_format": "mp3",
+        "additionalOptions": {}
+      },
+      "type": "n8n-nodes-smallestai.smallestai",
+      "typeVersion": 1,
+      "position": [
+        -6816,
+        2656
+      ],
+      "id": "e53fe1eb-02f9-4a90-92bd-341c25ec3b32",
+      "name": "(.rec)Synthesize speech",
+      "credentials": {
+        "smallestaiApi": {
+          "id": "U3fPEG1aCWCXYL6m",
+          "name": "Smallest.ai account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "phone",
+        "messageId": "={{ $('Webhook').item.json.body.data.contextInfo.stanzaId }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6368,
+        1712
+      ],
+      "id": "87532916-6d9f-4163-814f-d7ca21fd18ef",
+      "name": "(.stic)Get media in base64",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9eba72c6-6de7-4644-9774-c36a6d7a8c9d",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".conv",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f1a7ec86-8d36-4354-aa04-289e6f438a15",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".pfp",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".del",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "5912e3c7-83fe-4727-a8c2-fbfbadc0a0e2"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6e37460f-c8b6-4e97-abec-8975d3f000cf",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".stic",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "01c9db1b-c5fd-48fe-ae10-ed53f9f157d4",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".tran",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b314c16e-6d93-4de7-b540-8f22429f0936",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -6768,
+        1504
+      ],
+      "id": "1e9a3c2d-5c1e-4476-8efc-38029876253e",
+      "name": "control"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "de46abce-25dd-4285-ab1f-d9f362b68fb7",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".get",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6c0d82e2-a432-4c11-8a32-6701b0a7e869",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".grap",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f81c3600-fe51-40b6-a145-1f17e6ace576",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".info",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".find",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "5912e3c7-83fe-4727-a8c2-fbfbadc0a0e2"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b55cf753-d078-4f6b-9920-591dc38b11a2",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".r",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -7168,
+        4912
+      ],
+      "id": "a65170ff-3786-43d2-98a8-2e81a960cd66",
+      "name": "search"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "phone",
+        "messageId": "={{ $('Webhook').item.json.body.data.contextInfo.stanzaId }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6768,
+        4960
+      ],
+      "id": "04036bbf-f5c6-4f6e-9ec9-0047a81d3abc",
+      "name": ".info",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.data.contextInfo.quotedMessage.conversation}}",
+                    "rightValue": "@nova",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "8fc45176-16be-44dc-8951-4e7a9c5d228c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "72a507e3-637e-4090-92c5-983ea98c08c9",
+                    "leftValue": "={{ $json.body.data.contextInfo.quotedMessage.conversation}}",
+                    "rightValue": "@vex",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -6784,
+        6064
+      ],
+      "id": "4f49551c-8db9-42d6-8e4f-39a8ac71562e",
+      "name": "nova"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".nova",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "2740fcaf-93d8-4907-b3d1-d95429164031"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "20be88fd-ff1d-4568-9009-395d48cc30ac",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".vex",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9b81f6b3-bded-468c-9bc8-93542d6dd965",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".ask",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -6784,
+        6224
+      ],
+      "id": "b4fcb7c7-99d0-44dd-afe9-487a5cee1a30",
+      "name": "vex"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3ce0419a-a4b0-4217-8e6a-cd0451fc849f",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".rec",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b7675c72-de05-4d8e-8790-e6916c685e0a",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".duck",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d43ce8e4-2e2a-41bf-a8e8-d05c21607723",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".pin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ec5c7648-fc73-427b-94d3-dceb507f3dce",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".gen",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c69f92fb-ca1a-4ab1-966f-f204b04f4ff5",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".aud",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".vid",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "7a50872b-da1c-47cf-b0ce-28926574d9d9"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "790e7d82-2c98-4aed-b4a9-20bb6baebb77",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".yt",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7268cbff-e16d-4d36-b7bc-09e275dda0c0",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".enh",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a0c9f5e0-bd30-465c-af13-5b8ac65d9189",
+                    "leftValue": "={{ $json.body.data.message.conversation.toLowerCase()}}",
+                    "rightValue": ".bg",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -7264,
+        3136
+      ],
+      "id": "7d96ab81-cc68-476b-982b-24bb3224ad22",
+      "name": "midea"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ubuntu-ytdl_material-1:17442/api/downloadFile?apiKey=da77147b-76e9-49ca-be51-31be95a6f126",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.body.data.message.conversation.substring(4) }}\",\n  \"type\": \"video\",\n\n  \"customOutput\": \"{{$json.body.data.key.id }}\"\n\n\n  \n\n\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -6816,
+        3360
+      ],
+      "id": "6a60c1de-fa71-49c1-936e-24436928f5f5",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://songfinder-file-recognition.p.rapidapi.com/api/rapidapi/recognize/file?startTime=0",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-RapidAPI-Key",
+              "value": "d177be486emsh647b4995c80c85cp1bcec4jsn8ffeb0cb6764"
+            },
+            {
+              "name": "X-RapidAPI-Host",
+              "value": "songfinder-file-recognition.p.rapidapi.com"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -6112,
+        4768
+      ],
+      "id": "e4015837-058e-484c-812e-7fbdad14786b",
+      "name": "find music"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6416,
+        4768
+      ],
+      "id": "371c391b-07e2-49a9-bfb7-733179c64e45",
+      "name": "Convert to File2"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "phone",
+        "messageId": "={{ $('Webhook').item.json.body.data.contextInfo.stanzaId }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6768,
+        4768
+      ],
+      "id": "c84944f4-dd4c-4c76-b1de-830be8dc5826",
+      "name": ".grap",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $('find music').item.json.track.coverArt }}",
+        "caption": "=title:{{ $('find music').item.json.track.title }}\nartist:{{ $('find music').item.json.track.artist }}\nalbum:{{ $('find music').item.json.track.album }}\nyt-link:{{ $json.url }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5360,
+        4688
+      ],
+      "id": "c31ece2c-122e-4385-b1e0-2cc1f7cc50de",
+      "name": "Send image4",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "59b186e7-059a-4054-9c61-4c36b8dbb671",
+              "leftValue": "={{ $json.track.title }}",
+              "rightValue": false,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5888,
+        4768
+      ],
+      "id": "53e44467-edb5-4a13-bde4-4aeaa7304376",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "phone",
+        "remoteJid": "={{ $node[\"Webhook\"].json.body.data.key.remoteJid }}",
+        "messageText": "=sadly no music by this name \n",
+        "options_message": {
+          "quoted": {
+            "messageQuoted": {
+              "messageId": "={{ $('Webhook').item.json.body.data.key.id }}"
+            }
+          },
+          "linkPreview": true
+        }
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5552,
+        4832
+      ],
+      "id": "d44ad4b1-7606-4fb8-9a88-2917850b7bb2",
+      "name": "Send text5",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ $json.track.title }} youtube",
+        "webSearchOptions": {
+          "maxResults": 1,
+          "region": "wt-wt",
+          "safeSearch": -1
+        },
+        "cacheSettings": {
+          "enableCache": true,
+          "cacheTTL": 300
+        }
+      },
+      "type": "n8n-nodes-duckduckgo-search.duckDuckGo",
+      "typeVersion": 1,
+      "position": [
+        -5568,
+        4688
+      ],
+      "id": "426c422e-bd3d-42de-909d-6590dde2dcbe",
+      "name": "DuckDuckGo"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=shared-videos/{{$('Webhook').item.json.body.data.key.id }}Conv.mp4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        -5952,
+        3360
+      ],
+      "id": "2a92f8d9-6e69-4de7-a970-03aa1e162d11",
+      "name": "Read/Write Files from Disk2",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-video",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5504,
+        3344
+      ],
+      "id": "966df55a-3bcb-43d0-8637-738ad53d1f5f",
+      "name": "Send video3",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -5744,
+        3344
+      ],
+      "id": "bcd8b28a-bf65-4d84-88fe-6c6f73ada711",
+      "name": "Extract from File4"
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=sudo ffmpeg -i {{$('Webhook').item.json.body.data.key.id  }}.mp4 -c:v libx264 -profile:v main -bf 0 -crf 23 -pix_fmt yuv420p -c:a aac -b:a 128k {{$('Webhook').item.json.body.data.key.id }}Conv.mp4\n",
+        "cwd": "shared-downloads/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6240,
+        3360
+      ],
+      "id": "e7d35e20-b236-4348-b299-225217f720c2",
+      "name": "Execute a command2",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -6544,
+        3360
+      ],
+      "id": "fcf42f90-f05c-4e18-aca5-eea44d43c6a6",
+      "name": "Wait",
+      "webhookId": "2bd818df-7059-4e36-b7c3-a0c092e449b2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa09e3be-7075-4d04-b597-7790fef2a3c2",
+              "name": "stdout",
+              "value": "={{  $json.stdout.split(\",\")}}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6528,
+        3008
+      ],
+      "id": "8d3080e1-a99f-4ae9-9703-1ae1c1008853",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "20800009-e426-4b5e-98aa-72c963d8c292",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation.split(\" \").last().isNumeric() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6256,
+        3008
+      ],
+      "id": "48b7efa7-5882-45db-b5d8-ff62a8fb088c",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "searchImages",
+        "imageQuery": "={{$json.body.data.message.conversation.substring(5) }}",
+        "imageSearchOptions": {
+          "maxResults": 15,
+          "region": "wt-wt"
+        },
+        "cacheSettings": {
+          "enableCache": true,
+          "cacheTTL": 300
+        }
+      },
+      "type": "n8n-nodes-duckduckgo-search.duckDuckGo",
+      "typeVersion": 1,
+      "position": [
+        -6816,
+        2832
+      ],
+      "id": "609a617b-5fd4-4133-bd82-1c350d433d37",
+      "name": ".duck"
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=python3 scrap.py \"{{  $('Webhook').item.json.body.data.message.conversation.split(\" \").last().isNumeric()? $('Webhook').item.json.body.data.message.conversation.substring(5).slice(0,-2):$('Webhook').item.json.body.data.message.conversation.substring(5)}}\" \n",
+        "cwd": "~/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6816,
+        3008
+      ],
+      "id": "83750e98-0273-46f3-b9cf-73259f7bfb97",
+      "name": ".pin",
+      "alwaysOutputData": false,
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5312,
+        2992
+      ],
+      "id": "7ed95bb3-56e4-4fe2-8b95-2af6cd691676",
+      "name": "Send image6",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.stdout.randomItem().replaceAll(\"'\",\" \").replaceAll(\"[\",\"\").replaceAll(\"]\",\"\") }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -5728,
+        2992
+      ],
+      "id": "811eae50-e6bc-4c48-9cc4-b25ba7461a64",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "stdout",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -5920,
+        3136
+      ],
+      "id": "22817f45-6c27-4464-ba5b-c8840392a5c6",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.stdout.replaceAll(\"'\",\"\").replaceAll(\"[\",\"\").replaceAll(\"]\",\"\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -5728,
+        3136
+      ],
+      "id": "d06c9028-9bfd-4dca-9573-498eeac44a7f",
+      "name": "HTTP Request7"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -5504,
+        2992
+      ],
+      "id": "f77d0c16-ccfc-468b-8682-274dee3eb265",
+      "name": "Extract from File6"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -6176,
+        5936
+      ],
+      "id": "8660b8d7-7490-494f-9f1b-da57a3d5e373",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "kEBNmlbFs4Gu0JTA",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json.body.data.contextInfo.quotedMessage.conversation+\"\\n\" }}\n{{ $json.body.data.message.conversation.split(\" \").filter(word => !word.includes('.')).join(\" \")}}\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Reply at max 10 lines and add \"your dear @nova\" at the end .  Act like an anime girl keep the conversation funny and cute ,but super serouis showing how dispointied you are in them,sclding the person for searching a nasty thing,making them feel guilty "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -6176,
+        5760
+      ],
+      "id": "b59d728a-f304-4d81-a955-ef7683c29c8a",
+      "name": "cutie nova1"
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "resource": "file",
+        "operation": "download",
+        "path": "shared-downloads/out.mp4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6528,
+        3792
+      ],
+      "id": "bca38198-0200-4bd1-bb24-681102736dc1",
+      "name": "Download a file",
+      "alwaysOutputData": false,
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6256,
+        3792
+      ],
+      "id": "cd5c9c4f-5f84-430f-9a32-e2e92cbfbc54",
+      "name": "Extract from File7"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-video",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6048,
+        3792
+      ],
+      "id": "0b05d851-6bd6-4c1f-aeb4-d045fda2d549",
+      "name": "Send video4",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7d23eac8-5dff-491e-9e0a-c511d711e54f",
+              "leftValue": "={{ $json.posts[0].error }}",
+              "rightValue": "hentai warning",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6416,
+        5360
+      ],
+      "id": "69702cce-2743-48df-b884-8b56c2efcacb",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "sudo rm out.mp4 out.mp3",
+        "cwd": "shared-downloads/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -5840,
+        3712
+      ],
+      "id": "361560fe-f046-4990-886c-a9be825a18af",
+      "name": "Execute a command4",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "resource": "file",
+        "operation": "download",
+        "path": "shared-downloads/out.mp3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6528,
+        3632
+      ],
+      "id": "a07c8f85-e3dd-4d02-81e3-730db458cf50",
+      "name": "Download a file1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6256,
+        3600
+      ],
+      "id": "c3ccab8d-3566-43aa-8a78-0390583c57e1",
+      "name": "Extract from File8"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-audio",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6048,
+        3632
+      ],
+      "id": "87fa966f-f4c3-47d2-9cb0-9e5dbfbcb409",
+      "name": "Send audio2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=sudo yt-dlp --cookies cookies.txt -S \"height:480\" --force-overwrites  -f \"bestvideo[height<=480][vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=480][ext=mp4]+bestaudio/best[height<=480][ext=mp4]/best[height<=720]/best\" --merge-output-format mp4 --extractor-args \"youtube:player_client=tv\" {{  $('Webhook').item.json.body.data.message.conversation.substring(4)}} -t mp3 -o out",
+        "cwd": "shared-downloads/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6816,
+        3632
+      ],
+      "id": "de7b68fd-c045-4c31-9969-702a2360f398",
+      "name": ".aud",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=sudo yt-dlp --cookies cookies.txt -S \"height:480\" --force-overwrites  -f \"bestvideo[height<=480][vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=480][ext=mp4]+bestaudio/best[height<=480][ext=mp4]/best[height<=720]/best\" --merge-output-format mp4 --extractor-args \"youtube:player_client=tv\" {{  $('Webhook').item.json.body.data.message.conversation.substring(4)}} -o out.mp4",
+        "cwd": "shared-downloads/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6816,
+        3792
+      ],
+      "id": "90bac98b-5272-45d2-aa08-acfc348e3078",
+      "name": ".yt",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=python3 gen.py {{ $json.body.data.message.conversation.substring(5) }}",
+        "cwd": "ImageGen/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6896,
+        3136
+      ],
+      "id": "56acdc85-9f45-4dbe-8fd9-51e28e815570",
+      "name": ".gen",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6528,
+        3216
+      ],
+      "id": "4f997393-df20-4f99-bca4-d99e03ae64d6",
+      "name": "Extract from File5"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data }}",
+        "caption": "={{ $('Webhook').item.json.body.data.message.conversation.substring(5) }}",
+        "options_message": {
+          "quoted": {
+            "messageQuoted": {
+              "messageId": "={{ $('Webhook').item.json.body.data.key.id }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6256,
+        3216
+      ],
+      "id": "668baf53-35e2-42f0-8916-12386e6ddb69",
+      "name": "Send image5",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=python3 gen.py {{ $json }}",
+        "cwd": "ImageGen/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6816,
+        3456
+      ],
+      "id": "56acdc85-9f45-4dbe-8fd9-51e28e815570",
+      "name": "Execute a command7",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.data.message.conversation.substring(5)}}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "keep ur answer short "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -6272,
+        6432
+      ],
+      "id": "b08910a3-c9b3-4d0e-ae16-3793f6ebae9a",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -6064,
+        6448
+      ],
+      "id": "4abe9f8f-6008-4784-974f-794c2759f2e8",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "kEBNmlbFs4Gu0JTA",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "google_images",
+        "q": "={{  $('Webhook').item.json.body.data.message.conversation.split(\" \").last().isNumeric()? $('Webhook').item.json.body.data.message.conversation.substring(5).slice(0,-2):$('Webhook').item.json.body.data.message.conversation.substring(5)}}",
+        "additionalFields": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApi",
+      "typeVersion": 1,
+      "position": [
+        -6768,
+        4592
+      ],
+      "id": "30b65446-fd5d-49f2-aa83-7d36e48eb76e",
+      "name": ".get",
+      "credentials": {
+        "serpApi": {
+          "id": "NfIWloL9MC92qFtJ",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "= python3 trans.py \"{{ $json.body.data.message.conversation[0] }}\" {{ $json.body.data.message.conversation[1]||\"ar\" }}",
+        "cwd": "/home/ubuntu/translator/"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -6128,
+        1904
+      ],
+      "id": "6e322dc6-f570-4981-adfd-99e6a86e8cbb",
+      "name": "Execute a command5",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "6SFL1VjU0ylIp7tY",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "messageText": "=trans: {{ $json.stdout.substring(10).split(\",\")[2].substring(6) }}\nsrc: {{ $json.stdout.substring(10).split(\",\")[0].substring(5) }}\n{{ $json.stdout.substring(10).split(\",\")[3].replace(\"=\",\": \") }}\n",
+        "options_message": {
+          "linkPreview": true
+        }
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5872,
+        1904
+      ],
+      "id": "48c97ff1-65fa-4915-8648-2cfcd4a8fa37",
+      "name": "Send text6",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f3dd7c61-a1fa-4a80-972a-1ef6aefc671b",
+              "name": "stdout",
+              "value": "={{$('Edit Fields5').item.json.stdout.slice(0,$('Webhook').item.json.body.data.message.conversation.split(\" \").last().toNumber())}}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6096,
+        3136
+      ],
+      "id": "5c273401-ef03-4bdd-a420-312cba930bc8",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6658937c-d9d8-4c29-89c1-3734a1883e85",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation.split(\" \").last().isNumeric() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6416,
+        4592
+      ],
+      "id": "149c743c-062e-4f7e-a74e-90dae9ee9fd7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{  $json.original}}",
+        "caption": "=",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5792,
+        4608
+      ],
+      "id": "6c8ece51-d7d0-45a1-afde-a98590b5ed44",
+      "name": "Send image7",
+      "retryOnFail": true,
+      "waitBetweenTries": 5,
+      "maxTries": 5,
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "391d3349-16c5-4956-8eb2-7762b41a2b15",
+              "name": "images_results",
+              "value": "={{ $json.images_results.slice(0,$('Webhook').item.json.body.data.message.conversation.split(\" \").last().toNumber()) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6112,
+        4608
+      ],
+      "id": "4f4e8338-9336-4cd5-8999-7cc46a01921f",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "phone",
+        "messageId": "={{ $('Webhook').item.json.body.data.contextInfo.stanzaId }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6816,
+        3968
+      ],
+      "id": "1272405e-20b4-4f43-ae8d-158f208a9f60",
+      "name": ".info1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5920,
+        3968
+      ],
+      "id": "60e07469-1b1e-4f29-9bef-986d9c062481",
+      "name": "Send image8",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.claid.ai/v1/image/edit/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Host",
+              "value": "api.claid.ai"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer dd07a2127ae6491bbe176ad2debb5832"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={\"operations\":{\n\"resizing\":{\"width\":1000},\n\"background\":{\"remove\":false}}\n}\n{\n    \"operations\": {\n        \"restorations\": {\n            \"upscale\": \"smart_enhance\",\n            \"polish\": false\n        },\n        \"resizing\": {\n            \"width\": \"auto\",\n            \"height\": \"auto\",\n            \"fit\": \"bounds\"\n        }\n    },\n    \"output\": {\n        \"format\": {\n            \"type\": \"jpeg\",\n            \"quality\": 80,\n            \"progressive\": true\n        }\n    }\n}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -6304,
+        3968
+      ],
+      "id": "4915f1cd-a096-484a-aff6-2dace58a3ac8",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6560,
+        3968
+      ],
+      "id": "2c7c403d-6c48-4e55-8397-610ea74b25c9",
+      "name": "Convert to File3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.output.tmp_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -6096,
+        3968
+      ],
+      "id": "ba49a6a5-6fd2-4dad-98c9-e30f29b8bc33",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "messageText": "=control commands🛂:\t\n\t.pَfp:reply to a photo to put it as profile picture✨\n\t.deًl :🔥burn down the message by replying to it🔥\n\t.sًtic: reply to any photo to make it a sticker 🐸\n\t.ًtran: translate a message (.َtran text that isnt needed ,ar)to \ttrnslate it into arabic 🏳️\n\t\nmedia📽️:\n\t.َrec: type whatever you want after the command to make it into a record🎙️\n\t.َduck:search and get a photo of what you want📸(.َduck miku)\n\t.َpin:same as .َduck but you can get as many photo as you want(.pَin miku 12)📱\n\t.gٍen:generate anything just by sending a single word🤖\n\t.ٍaud , .ٍvid : get any link and download it as an audio or an video🎬\n\nsearch🔍:\t\n\t.ٍget:to get an image from google👀\n\t.ٍgrap:to find music from a video or an audio(reply to it)🎤\n\t.inَfo:to get infomationa about what is in the img(reply to it)❓\n\t.ٍr:to get photos from reddit ®️\n    .bg:remove background from any pic(reply to it)📎\nAI BOTS!!!:\n\t.ٍnova: a cutie patoti that acts like a magical girl, great for comforting you🎀\n\t.ِvex: the nightmare side ,a guy who have a perfect rosting skills in Egyptian dialect 👹\n\t\n\njust get anything you like and place \".\" before it ",
+        "options_message": {
+          "linkPreview": true
+        }
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6368,
+        2096
+      ],
+      "id": "f035423a-7b95-490b-a81f-de8a5fbef492",
+      "name": ".help",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c29fd9a3-2417-409a-82b9-bc075dbbe3e0",
+              "name": "body.data.message.conversation",
+              "value": "={{ $json.body.data.message.conversation.substring(5).split(\"|\") }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6368,
+        1904
+      ],
+      "id": "ad004aa4-307e-4e30-8382-237b2b72e9ea",
+      "name": ".tran"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data.base64 }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6144,
+        1152
+      ],
+      "id": "8c67f704-a355-4f6b-899c-c4ad89f8fc31",
+      "name": "Send image9",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6560,
+        4256
+      ],
+      "id": "9592ba2e-255e-4de0-9374-55478abb0bdb",
+      "name": "Convert to File4"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6016,
+        4256
+      ],
+      "id": "4274e319-ad5f-44fe-bf67-186e3d00af5c",
+      "name": "Extract from File2"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "phone",
+        "messageId": "={{ $('Webhook').item.json.body.data.contextInfo.stanzaId }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6384,
+        1152
+      ],
+      "id": "f925a4bc-8400-4ddc-ab3b-4a6a1ca79b1e",
+      "name": "Get media in base",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "phone",
+        "messageId": "={{ $('Webhook').item.json.body.data.contextInfo.stanzaId }}"
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6800,
+        4256
+      ],
+      "id": "be1055c4-03ac-4405-ae67-03442423f61b",
+      "name": "Get media in base1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "phone",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.data }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-en.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5776,
+        4256
+      ],
+      "id": "1aa11e1c-1664-4aeb-b1c1-152d00a0574e",
+      "name": "Send image10",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ae4ShErXbMo4ekPV",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "DATA"
+      },
+      "type": "@picsart/n8n-nodes-picsart-creative-apis.picsartImage",
+      "typeVersion": 1,
+      "position": [
+        -6304,
+        4256
+      ],
+      "id": "27be1103-68f6-40cc-9d12-c08c7361d4b9",
+      "name": "Remove Background DATA",
+      "credentials": {
+        "picsartApi": {
+          "id": "PZZMSPBMCF5u6L4K",
+          "name": "Picsart account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://image.pollinations.ai/prompt/{{ encodeURIComponent($json.body.data.message.conversation.substring(5)) }}?width=1024&height=1024&seed=42&nologo=true",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -6816,
+        3216
+      ],
+      "id": "62933daa-ccf6-4b5f-ab0f-b56971c6021c",
+      "name": ".gen2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "vex",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "nova",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "control",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "search",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "midea",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send text": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "nightmare vex",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Send image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send image": {
+      "main": [
+        []
+      ]
+    },
+    "Send audio": {
+      "main": [
+        []
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Send audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Send text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send text2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update profile picture": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Send image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cutie nova": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nightmare vex": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Send image2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Send image7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(.pfp)Get media in base65": {
+      "main": [
+        [
+          {
+            "node": "Update profile picture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".r": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".find(base64)": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(.rec)Synthesize speech": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(.stic)Get media in base64": {
+      "main": [
+        [
+          {
+            "node": "Enviar sticker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "control": {
+      "main": [
+        [
+          {
+            "node": "Get media in base",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "(.pfp)Get media in base65",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".del",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "(.stic)Get media in base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".tran",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".help",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search": {
+      "main": [
+        [
+          {
+            "node": ".get",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".grap",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".find(base64)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".r",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".info": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "nova": {
+      "main": [
+        [
+          {
+            "node": "cutie nova",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "nightmare vex",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "vex": {
+      "main": [
+        [
+          {
+            "node": "cutie nova",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "nightmare vex",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "midea": {
+      "main": [
+        [
+          {
+            "node": "(.rec)Synthesize speech",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".duck",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".pin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".gen",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": ".gen2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".aud",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".yt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": ".info1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get media in base1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "find music",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".grap": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "find music": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "DuckDuckGo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send text5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DuckDuckGo": {
+      "main": [
+        [
+          {
+            "node": "Send image4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File4": {
+      "main": [
+        [
+          {
+            "node": "Send video3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command2": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Execute a command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send video3": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".duck": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".pin": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Extract from File6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "Extract from File6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File6": {
+      "main": [
+        [
+          {
+            "node": "Send image6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "cutie nova",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "cutie nova1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cutie nova1": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download a file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File7": {
+      "main": [
+        [
+          {
+            "node": "Send video4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cutie nova1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send video4": {
+      "main": [
+        [
+          {
+            "node": "Execute a command4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download a file1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File8": {
+      "main": [
+        [
+          {
+            "node": "Send audio2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send audio2": {
+      "main": [
+        [
+          {
+            "node": "Execute a command4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".aud": {
+      "main": [
+        [
+          {
+            "node": "Download a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".yt": {
+      "main": [
+        [
+          {
+            "node": "Download a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".gen": {
+      "main": [
+        []
+      ]
+    },
+    "Extract from File5": {
+      "main": [
+        [
+          {
+            "node": "Send image5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".get": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a command5": {
+      "main": [
+        [
+          {
+            "node": "Send text6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send image3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".info1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "Send image8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".tran": {
+      "main": [
+        [
+          {
+            "node": "Execute a command5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File4": {
+      "main": [
+        [
+          {
+            "node": "Remove Background DATA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File2": {
+      "main": [
+        [
+          {
+            "node": "Send image10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media in base": {
+      "main": [
+        [
+          {
+            "node": "Send image9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media in base1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Background DATA": {
+      "main": [
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ".gen2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send image7": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "42e66e01-f3ad-42eb-8868-0d1111f65aa2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f839843ab756fecd86e7fc2b7cbbbde357c4fd19e3f77f12a6ac0b0c1d8916c8"
+  },
+  "nodeGroups": [],
+  "id": "uy4P4VIDAkrrZcU3",
+  "tags": []
+}
