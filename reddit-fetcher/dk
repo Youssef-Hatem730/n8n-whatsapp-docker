@@ -1,0 +1,18 @@
+# Step 1: Use Playwright's official Python image (comes with system dependencies)
+FROM mcr.microsoft.com/playwright/python:v1.49.0-noble
+
+# Step 2: Set the working directory
+WORKDIR /app
+
+# Step 3: Copy requirements and install Playwright Python package
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Step 4: Install the actual browser binaries (Chromium, Firefox, WebKit)
+RUN playwright install
+
+# Step 5: Copy your local code into the container
+COPY . .
+
+# Step 6: Command to run your script
+CMD ["python", "app.py"]
