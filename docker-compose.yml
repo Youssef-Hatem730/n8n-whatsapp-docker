@@ -141,7 +141,7 @@ services:
 
     environment:
 
-      - WEBHOOK_URL=http://54.243.228.192:5678/  # Replace with your actual domain or IP
+      - WEBHOOK_URL=http://localhost:5678/  # Replace with your actual domain or IP
 
       - N8N_PROXY_HOPS=1
       - YT_DLP_PATH=/home/ubuntu/.local/bin/yt-dlp
